@@ -2,8 +2,9 @@
 import { useWizard } from '@/context/LoanWizardContext';
 import { GlossaryTerm } from '@/components/GlossaryTerm';
 import FieldTooltip from '@/components/FieldTooltip';
-import { Input, Button } from '@/components/ui';
+import { Button } from '@/components/ui';
 import { formatXlmFromStroops } from '@/lib/formatMoney';
+import { WIZARD_FIELD_TOOLTIPS } from '@/lib/wizardFieldTooltips';
 import NumericInput from '@/components/NumericInput';
 
 const TERM_OPTIONS = [
@@ -18,7 +19,9 @@ export default function StepAmount() {
     useWizard();
 
   const maxLoan = appraisedValue ? Math.floor(parseInt(appraisedValue) * 0.7) : 0; // 70% LTV
-  const ltv = loanAmount && maxLoan ? ((parseInt(loanAmount) / maxLoan) * 70).toFixed(1) : '0';
+  // Round LTV to 2 decimal places to avoid floating-point artefacts like 74.99999999%
+  const ltvRaw = loanAmount && maxLoan ? (parseInt(loanAmount) / parseInt(appraisedValue)) * 100 : 0;
+  const ltv = ltvRaw.toFixed(2);
   const healthFactor =
     loanAmount && appraisedValue
       ? (parseInt(appraisedValue) / parseInt(loanAmount) / 1.5).toFixed(2)
@@ -67,7 +70,7 @@ export default function StepAmount() {
         {/* Label row: text + info tooltip */}
         <div className="flex items-center mb-1">
           <span className="text-sm font-medium text-brown">Loan Amount (stroops)</span>
-          <FieldTooltip hint={WIZARD_FIELD_TOOLTIPS.loanAmount} />
+          <FieldTooltip content={WIZARD_FIELD_TOOLTIPS.loanAmount} />
         </div>
         <NumericInput
           label=""
@@ -111,7 +114,7 @@ export default function StepAmount() {
       <div>
         <div className="flex items-center mb-2">
           <label className="text-sm font-medium text-brown">Loan Term</label>
-          <FieldTooltip hint={WIZARD_FIELD_TOOLTIPS.loanTerm} />
+          <FieldTooltip content={WIZARD_FIELD_TOOLTIPS.loanTerm} />
         </div>
         <div className="grid grid-cols-4 gap-2">
           {TERM_OPTIONS.map(({ days, label, rate }) => (

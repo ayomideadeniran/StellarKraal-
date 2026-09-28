@@ -321,6 +321,7 @@ npm run test:frontend
 | [CORS Configuration](docs/cors-configuration.md) | Allowed origins strategy, per-environment setup, and troubleshooting |
 | [Docker Compose Services](docs/docker-compose-services.md) | Service dependencies, startup order, health checks, and volumes |
 | [Performance Tuning Guide](docs/performance-tuning.md) | Environment variables, DB tuning, caching, and profiling guidance |
+| [Threat Model](docs/security/threat-model.md) | Key attack surfaces (JWT forgery, oracle manipulation, re-entrancy, webhook replay), mitigations, and residual risk register |
 
 ## User Guides
 
@@ -357,20 +358,14 @@ Key design decisions are documented as ADRs in [`docs/adr/`](docs/adr/).
 | [ADR-006](docs/adr/ADR-006-oracle-design.md) | Multi-oracle median aggregation for price feeds | Accepted |
 | [ADR-007](docs/adr/ADR-007-oracle-twap.md) | Time-Weighted Average Price (TWAP) for liquidation price feeds | Accepted |
 | [ADR-008](docs/adr/ADR-008-webhooks.md) | Webhook-based event delivery for loan lifecycle notifications | Accepted |
-| [ADR-009](docs/adr/ADR-009-api-v2-design.md) | API v2 Design Direction (REST vs GraphQL vs tRPC) | Proposed |
+| [ADR-009](docs/adr/ADR-009-api-v2-design.md) | API v2 Design Direction (REST vs GraphQL vs tRPC) | Superseded by ADR-011 |
+| [ADR-010](docs/adr/ADR-010-event-driven-architecture.md) | Event-Driven Architecture | Accepted |
+| [ADR-011](docs/adr/ADR-011-graphql-api-v2.md) | GraphQL as the API v2 Query Layer | Accepted |
 
 To add a new ADR, copy [`docs/adr/template.md`](docs/adr/template.md), increment the number, fill in all sections, and add a row to the table above.
 
 ---
 website https://kraal-bloom-connect.lovable.app/
-
-## Architecture Decision Records (ADRs)
-
-| ADR | Title | Status |
-|-----|-------|--------|
-| [ADR-009](docs/adr/ADR-009-api-v2-design.md) | API v2: REST vs GraphQL vs tRPC | Accepted |
-
----
 
 ## License
 

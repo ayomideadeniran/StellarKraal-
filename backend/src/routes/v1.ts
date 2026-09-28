@@ -25,7 +25,7 @@ import {
   batchRegisterCollateral,
   getCollateralById,
 } from '../services/collateralService';
-import { getProfile, updateProfile, insertAuditEntry, listCollateral, listLoans } from '../db/store';
+import { getProfile, updateProfile, insertAuditEntry, listCollateral, listLoans, getTransaction } from '../db/store';
 import { updateProfileSchema } from '../validators/profile';
 import { validate } from '../middleware/validate';
 import { auditMiddleware, redact, auditLogger } from '../middleware/audit';
@@ -321,13 +321,26 @@ v1Router.get(
   asyncHandler(async (req: Request, res: Response) => {
     try {
       const result = listLoansPaginated(req.query as Record<string, string | undefined>);
-      res.json({
+      const body: Record<string, unknown> = {
         data: result.data,
-        total: result.total,
-        page: result.page,
         limit: result.limit,
         pageSize: result.pageSize,
-      });
+        paginationMode: result.paginationMode,
+      };
+
+      if (result.paginationMode === 'cursor') {
+        // Cursor mode: omit offset-only fields, expose cursor navigation fields
+        body.nextCursor = result.nextCursor ?? null;
+        body.hasMore = result.hasMore ?? false;
+      } else {
+        // Offset mode: include legacy total/page fields
+        body.total = result.total;
+        body.page = result.page;
+        body.nextCursor = null;
+        body.hasMore = false;
+      }
+
+      res.json(body);
     } catch (err) {
       if (err instanceof InvalidPaginationError) {
         return res.status(400).json({ error: err.message });
@@ -551,6 +564,20 @@ v1Router.get(
     }
     // NOT_FOUND → still pending (in mempool or not yet confirmed)
     return res.json({ status: 'pending' });
+  })
+);
+
+// GET /api/v1/transactions/:id — get transaction details by local DB ID
+v1Router.get(
+  '/transactions/:id',
+  readLimiter,
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params as { id: string };
+    const tx = getTransaction(id);
+    if (!tx) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+    res.json(tx);
   })
 );
 
